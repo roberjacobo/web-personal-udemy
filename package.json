@@ -1,0 +1,15 @@
+{
+  "name": "web-personal-api",
+  "version": "0.0.1",
+  "description": "Backend server from web-personal udemy project",
+  "main": "index.js",
+  "repository": "https://github.com/roberjacobo/web-personal-udemy",
+  "author": "jose r jacobo",
+  "license": "MIT",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "mongoose": "6.6.1"
+  }
+}
