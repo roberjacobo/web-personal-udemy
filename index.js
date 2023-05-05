@@ -15,11 +15,9 @@ mongoose.connect(
   (error) => {
     if (error) throw error;
 
-    console.log("Your database connection has been established successfully!");
-
     app.listen(PORT, () => {
       console.log(
-        `###################\n#### API REST #####\n###################\n http://${IP_SERVER}:${PORT}/api/${API_VERSION}/`
+        `###################\n#### API REST #####\n###################\n http://${IP_SERVER}:${PORT}/api/${API_VERSION}`
       );
     });
   }
