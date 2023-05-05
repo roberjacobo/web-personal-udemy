@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("../utils/jwt");
+const EventEmitter = require("events");
 
 function register(req, res) {
   const { firstName, lastName, email, password } = req.body;
@@ -61,10 +62,24 @@ function login(req, res) {
   });
 }
 
+// Creamos un nuevo objeto EventEmitter
+
+const refreshEmitter = new EventEmitter();
+
+// Nos suscribimos al evento 'tokenRequiredError'
+
+refreshEmitter.on("tokenRequiredError", () => {
+  console.log("Se ha producido un error de token requerido!");
+});
+
 function refreshAccessToken(req, res) {
   const { token } = req.body;
 
-  if (!token) res.status(400).send({ msg: "Token requerido." });
+  if (!token) {
+    res.status(400).send({ msg: "Token requerido." });
+    refreshEmitter.emit("tokenRequiredError");
+    return;
+  }
 
   const { user_id } = jwt.decoded(token);
 
