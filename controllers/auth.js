@@ -5,8 +5,6 @@ const jwt = require("../utils/jwt");
 function register(req, res) {
   const { firstName, lastName, email, password } = req.body;
 
-  console.log(req.body);
-
   if (!email) res.status(400).send({ msg: "El email es obligatorio" });
   if (!password) res.status(400).send({ msg: "La contraseña es obligatoria" });
 
