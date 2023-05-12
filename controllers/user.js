@@ -103,7 +103,7 @@ async function deleteUser(req, res) {
 
   User.findByIdAndDelete(id, (error) => {
     if (error) {
-      res.status(401).send({ msg: "Error al eliminar el usuario" });
+      res.status(400).send({ msg: "Error al eliminar el usuario" });
     } else {
       res.status(200).send({ msg: "Usuario eliminado" });
     }
