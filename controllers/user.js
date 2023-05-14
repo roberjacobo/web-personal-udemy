@@ -28,7 +28,7 @@ async function getUsers(req, res) {
   res.status(200).send(response);
 }
 
-async function createUser(req, res) {
+function createUser(req, res) {
   const { password } = req.body;
 
   const salt = bcrypt.genSaltSync(10);
@@ -52,19 +52,18 @@ async function createUser(req, res) {
 
 /**
  *
- * @param {string} avatar File path if exists.
+ * @param {string} avatarPath File path if exists.
  */
-let deleteLocalAvatarIfExists = (avatar) => {
-  fs.unlink(`./uploads/${avatar}`, (error) => {
+const replaceLocalAvatarIfExists = (avatarPath) => {
+  fs.unlink(`./uploads/${avatarPath}`, (error) => {
     if (error) {
       console.error(error);
-      return;
     }
-    console.log("El archivo se ha eliminado correctamente");
+    console.log("El archivo se ha reemplazado correctamente");
   });
 };
 
-async function updateUser(req, res) {
+function updateUser(req, res) {
   const { id } = req.params;
   const userData = req.body;
 
@@ -79,11 +78,16 @@ async function updateUser(req, res) {
 
   // Avatar
   if (req.files.avatar) {
-    const { avatar } = await User.findById(id);
-
-    if (avatar !== undefined) {
-      deleteLocalAvatarIfExists(avatar);
-    }
+    User.findById(id, (err, doc) => {
+      if (err) {
+        console.log(err);
+      } else {
+        const { avatar } = doc;
+        if (avatar !== undefined) {
+          replaceLocalAvatarIfExists(avatar);
+        }
+      }
+    });
 
     const imagePath = image.getFilePath(req.files.avatar);
     userData.avatar = imagePath;
@@ -98,7 +102,7 @@ async function updateUser(req, res) {
   });
 }
 
-async function deleteUser(req, res) {
+function deleteUser(req, res) {
   const { id } = req.params;
 
   User.findByIdAndDelete(id, (error) => {
