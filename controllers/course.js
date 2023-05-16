@@ -1,6 +1,6 @@
 const Course = require("../models/course");
 const image = require("../utils/image");
-const fs = require("fs");
+const { deleteLocalFileIfExists } = require("./helpers");
 
 function createCourse(req, res) {
   const course = new Course(req.body);
@@ -33,37 +33,22 @@ async function getCourses(req, res) {
   });
 }
 
-/**
- *
- * @param {string} miniaturePath File path if exists.
- */
-const replaceLocalMiniatureIfExists = (miniaturePath) => {
-  fs.unlink(`./uploads/${miniaturePath}`, (error) => {
-    if (error) {
-      console.error(error);
-    }
-    console.log("El archivo se ha reemplazado correctamente");
-  });
-};
-
-function updateCourse(req, res) {
+async function updateCourse(req, res) {
   const { id } = req.params;
   const courseData = req.body;
 
   if (req.files.miniature) {
-    Course.findById(id, (err, doc) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const { miniature } = doc;
-        if (miniature !== undefined) {
-          replaceLocalMiniatureIfExists(miniature);
-        }
+    try {
+      const doc = await Course.findById(id);
+      const { miniature } = doc;
+      if (miniature !== undefined) {
+        await deleteLocalFileIfExists(miniature);
       }
-    });
-
-    const imagePath = image.getFilePath(req.files.miniature);
-    courseData.miniature = imagePath;
+      const imagePath = image.getFilePath(req.files.miniature);
+      courseData.miniature = imagePath;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   Course.findByIdAndUpdate({ _id: id }, courseData, (error) => {

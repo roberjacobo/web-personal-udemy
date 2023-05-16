@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 const image = require("../utils/image");
-const fs = require("fs");
+const { deleteLocalFileIfExists } = require("./helpers");
 
 async function getMe(req, res) {
   const { user_id } = req.user;
@@ -50,20 +50,7 @@ function createUser(req, res) {
   });
 }
 
-/**
- *
- * @param {string} avatarPath File path if exists.
- */
-const replaceLocalAvatarIfExists = (avatarPath) => {
-  fs.unlink(`./uploads/${avatarPath}`, (error) => {
-    if (error) {
-      console.error(error);
-    }
-    console.log("El archivo se ha reemplazado correctamente");
-  });
-};
-
-function updateUser(req, res) {
+async function updateUser(req, res) {
   const { id } = req.params;
   const userData = req.body;
 
@@ -78,19 +65,17 @@ function updateUser(req, res) {
 
   // Avatar
   if (req.files.avatar) {
-    User.findById(id, (err, doc) => {
-      if (err) {
-        console.log(err);
-      } else {
-        const { avatar } = doc;
-        if (avatar !== undefined) {
-          replaceLocalAvatarIfExists(avatar);
-        }
+    try {
+      const doc = await User.findById(id);
+      const { avatar } = doc;
+      if (avatar !== undefined) {
+        await deleteLocalFileIfExists(avatar);
       }
-    });
-
-    const imagePath = image.getFilePath(req.files.avatar);
-    userData.avatar = imagePath;
+      const imagePath = image.getFilePath(req.files.avatar);
+      userData.avatar = imagePath;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   User.findByIdAndUpdate({ _id: id }, userData, (error) => {
