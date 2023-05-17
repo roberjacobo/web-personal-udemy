@@ -1,12 +1,13 @@
-const mongoose = require("mongoose");
-const app = require("./app");
+const mongoose = require('mongoose');
+const app = require('./app');
 const {
   DB_USER,
   DB_PASSWORD,
   DB_HOST,
   API_VERSION,
-  IP_SERVER,
-} = require("./constants");
+  IP_SERVER
+} = require('./constants');
+const { logger } = './helpers';
 
 const PORT = process.env.POST || 3977;
 
@@ -16,7 +17,7 @@ mongoose.connect(
     if (error) throw error;
 
     app.listen(PORT, () => {
-      console.log(
+      logger.info(
         `###################\n#### API REST #####\n###################\n http://${IP_SERVER}:${PORT}/api/${API_VERSION}`
       );
     });

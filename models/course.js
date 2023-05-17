@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const mongoosePaginate = require("mongoose-paginate");
+const mongoose = require('mongoose');
+const mongoosePaginate = require('mongoose-paginate');
 
 const CourseSchema = mongoose.Schema({
   title: String,
@@ -7,9 +7,9 @@ const CourseSchema = mongoose.Schema({
   description: String,
   url: String,
   price: Number,
-  score: Number,
+  score: Number
 });
 
 CourseSchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model("Course", CourseSchema);
+module.exports = mongoose.model('Course', CourseSchema);

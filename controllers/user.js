@@ -1,21 +1,21 @@
-const bcrypt = require("bcryptjs");
-const User = require("../models/user");
-const image = require("../utils/image");
-const { deleteLocalFileIfExists } = require("./helpers");
+const bcrypt = require('bcryptjs');
+const User = require('../models/user');
+const image = require('../utils/image');
+const { deleteLocalFileIfExists } = require('./helpers');
 
-async function getMe(req, res) {
+async function getMe (req, res) {
   const { user_id } = req.user;
 
   const response = await User.findById(user_id);
 
   if (!response) {
-    res.status(400).send({ msg: "No se ha encontrado usuario." });
+    res.status(400).send({ msg: 'No se ha encontrado usuario.' });
   } else {
     res.status(200).send(response);
   }
 }
 
-async function getUsers(req, res) {
+async function getUsers (req, res) {
   const { active } = req.query;
   let response = null;
 
@@ -28,7 +28,12 @@ async function getUsers(req, res) {
   res.status(200).send(response);
 }
 
-function createUser(req, res) {
+function createUser (req, res) {
+  const requiredFields = Object.keys(req.body);
+
+  if (!requiredFields.every((field) => req.body[field]?.trim())) {
+    return res.status(400).send({ msg: 'Todos los valores son requeridos' });
+  }
   const { password } = req.body;
 
   const salt = bcrypt.genSaltSync(10);
@@ -43,14 +48,14 @@ function createUser(req, res) {
 
   user.save((error, userStored) => {
     if (error) {
-      res.status(400).send({ msg: "Error al crear el usuario." });
+      res.status(400).send({ msg: 'Error al crear el usuario.' });
     } else {
       res.status(201).send(userStored);
     }
   });
 }
 
-async function updateUser(req, res) {
+async function updateUser (req, res) {
   const { id } = req.params;
   const userData = req.body;
 
@@ -74,27 +79,27 @@ async function updateUser(req, res) {
       const imagePath = image.getFilePath(req.files.avatar);
       userData.avatar = imagePath;
     } catch (error) {
-      console.log(error);
+      throw new Error(error);
     }
   }
 
   User.findByIdAndUpdate({ _id: id }, userData, (error) => {
     if (error) {
-      res.status(400).send({ msg: "Error al actualizar el usuario" });
+      res.status(400).send({ msg: 'Error al actualizar el usuario' });
     } else {
-      res.status(200).send({ msg: "Usuario actualizado" });
+      res.status(200).send({ msg: 'Usuario actualizado' });
     }
   });
 }
 
-function deleteUser(req, res) {
+function deleteUser (req, res) {
   const { id } = req.params;
 
   User.findByIdAndDelete(id, (error) => {
     if (error) {
-      res.status(400).send({ msg: "Error al eliminar el usuario" });
+      res.status(400).send({ msg: 'Error al eliminar el usuario' });
     } else {
-      res.status(200).send({ msg: "Usuario eliminado" });
+      res.status(200).send({ msg: 'Usuario eliminado' });
     }
   });
 }
@@ -104,5 +109,5 @@ module.exports = {
   getUsers,
   createUser,
   updateUser,
-  deleteUser,
+  deleteUser
 };

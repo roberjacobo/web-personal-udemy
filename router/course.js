@@ -1,22 +1,23 @@
-const express = require("express");
-const multiparty = require("connect-multiparty");
+const express = require('express');
+const multiparty = require('connect-multiparty');
 
-const CourseController = require("../controllers/course");
-const md_auth = require("../middlewares/authenticated");
-const md_upload = multiparty({ uploadDir: "./uploads/course" });
+const CourseController = require('../controllers/course');
+const md_auth = require('../middlewares/authenticated');
+
+const md_upload = multiparty({ uploadDir: './uploads/course' });
 const api = express.Router();
 
 api.post(
-  "/course",
+  '/course',
   [md_auth.asureAuth, md_upload],
   CourseController.createCourse
 );
-api.get("/course", CourseController.getCourses);
+api.get('/course', CourseController.getCourses);
 api.patch(
-  "/course/:id",
+  '/course/:id',
   [md_auth.asureAuth, md_upload],
   CourseController.updateCourse
 );
-api.delete("/course/:id", [md_auth.asureAuth], CourseController.deleteCourse);
+api.delete('/course/:id', [md_auth.asureAuth], CourseController.deleteCourse);
 
 module.exports = api;
